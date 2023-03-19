@@ -55,16 +55,12 @@
 
         const geometry = new THREE.PlaneGeometry(2.5, 3.5);
         const texture = loader.load(textureUrl);
-        const roughness = loader.load('vc-badge-roughness.png');
-        const metalness = loader.load('vc-badge-metalness.png');
         const alpha = loader.load('vc-badge-alpha.png');
         const material = new THREE.MeshPhysicalMaterial({
-            roughnessMap: roughness,
-            metalnessMap: metalness,
             alphaMap: alpha,
             alphaTest: 0.05,
             metalness: 0.4,
-            roughness: 0.5,
+            roughness: 0,
             map: texture
         });
         const cardFront = new THREE.Mesh(geometry, material);
