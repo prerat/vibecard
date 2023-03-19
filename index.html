@@ -16,6 +16,9 @@
         import * as THREE from 'https://unpkg.com/three@0.122.0/build/three.module.js';
         import { RoomEnvironment } from 'https://unpkg.com/three@0.122.0/examples/jsm/environments/RoomEnvironment.js';
 
+        const params = new URL(window.location.toLocaleString()).searchParams;
+        const textureUrl = params.has('texture') ? params.get('texture') : 'vc-badge-front.png';
+
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -44,7 +47,7 @@
         scene.add(light3);
 
         const geometry = new THREE.PlaneGeometry(2.5, 3.5);
-        const texture = loader.load('vc-badge-front.png');
+        const texture = loader.load(textureUrl);
         const roughness = loader.load('vc-badge-roughness.png');
         const metalness = loader.load('vc-badge-metalness.png');
         const material = new THREE.MeshPhysicalMaterial({
