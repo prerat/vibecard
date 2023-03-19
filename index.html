@@ -43,7 +43,7 @@
         light3.position.set(-2.35,1.3,2);
         scene.add(light3);
 
-        const geometry = new THREE.BoxGeometry(2.5, 3.5, 0.01);
+        const geometry = new THREE.PlaneGeometry(2.5, 3.5);
         const texture = loader.load('vc-badge-front.png');
         const roughness = loader.load('vc-badge-roughness.png');
         const metalness = loader.load('vc-badge-metalness.png');
@@ -54,7 +54,21 @@
             roughness: 0.5,
             map: texture
         });
-        const card = new THREE.Mesh(geometry, material);
+        const cardFront = new THREE.Mesh(geometry, material);
+
+        const backGeometry = new THREE.PlaneGeometry(2.5, 3.5);
+        backGeometry.applyMatrix4(new THREE.Matrix4().makeRotationY(Math.PI));
+        const backTexture = loader.load('vc-badge-back.png');
+        const backMaterial = new THREE.MeshPhysicalMaterial({
+            roughness: 0.7,
+            map: backTexture
+        });
+        const cardBack = new THREE.Mesh(backGeometry, backMaterial);
+
+        const card = new THREE.Object3D();
+        card.add(cardFront);
+        card.add(cardBack);
+
         scene.add(card);
 
         camera.position.z = 5;
