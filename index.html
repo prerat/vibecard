@@ -14,12 +14,14 @@
 <body>
     <script type="module">
         import * as THREE from 'https://unpkg.com/three@0.122.0/build/three.module.js';
-        import { RoomEnvironment } from 'https://unpkg.com/three@0.122.0/examples/jsm/environments/RoomEnvironment.js';
+        import { RectAreaLightHelper } from 'https://unpkg.com/three@0.122.0/examples/jsm/helpers/RectAreaLightHelper.js';
+        import { RectAreaLightUniformsLib } from 'https://unpkg.com/three@0.122.0/examples/jsm/lights/RectAreaLightUniformsLib.js';
 
         const params = new URL(window.location.toLocaleString()).searchParams;
         const textureUrl = params.has('texture') ? params.get('texture') : 'vc-badge-front.png';
 
         const scene = new THREE.Scene();
+        RectAreaLightUniformsLib.init();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
         const loader = new THREE.TextureLoader();
@@ -28,23 +30,28 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        const pmremGenerator = new THREE.PMREMGenerator(renderer);
-        scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
-
-        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.05);
+        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.9);
         scene.add(ambientLight);
 
-        const light = new THREE.PointLight(0xFFFFFF, 0.25);
-        light.position.set(0,1,3);
-        scene.add(light);
+        function newLight(color, intensity, width, height, x, y, z) {
+            const light = new THREE.RectAreaLight(color, intensity, width, height);
+            light.position.set(x, y, z);
+            light.lookAt(0, 0, 0);
+            light.applyMatrix4(new THREE.Matrix4().makeRotationZ(Math.PI/8.0));
+            light.add(new RectAreaLightHelper(light));
+            return light;
+        }
 
-        const light2 = new THREE.PointLight(0xFFFF99, 0.25);
-        light2.position.set(0.5,1.5,4);
-        scene.add(light2);
-
-        const light3 = new THREE.PointLight(0xFF9999, 0.25);
-        light3.position.set(-2.35,1.3,2);
-        scene.add(light3);
+        scene.add(newLight(0xff0309, 5, .5, 20, -13, 0, 10));
+        scene.add(newLight(0x09ff09, 5, .3, 20, -10, 0, 8));
+        scene.add(newLight(0x03ff03, 5, .5, 20, -5, 0, 10));
+        scene.add(newLight(0xff0909, 5, .2, 20, -2.35, 0, 6));
+        scene.add(newLight(0x09ff09, 5, .3, 20, 0, 0, 8));
+        scene.add(newLight(0xff0309, 5, .5, 20, 1.5, 0, 10));
+        scene.add(newLight(0x09ff09, 5, .3, 20, 4, 0, 8));
+        scene.add(newLight(0x03ff03, 5, .5, 20, 7, 0, 10));
+        scene.add(newLight(0xff0909, 5, .2, 20, 11, 0, 6));
+        scene.add(newLight(0x09ff09, 5, .3, 20, 19, 0, 8));
 
         const geometry = new THREE.PlaneGeometry(2.5, 3.5);
         const texture = loader.load(textureUrl);
@@ -56,7 +63,7 @@
             metalnessMap: metalness,
             alphaMap: alpha,
             alphaTest: 0.05,
-            metalness: 0.5,
+            metalness: 0.4,
             roughness: 0.5,
             map: texture
         });
@@ -65,7 +72,7 @@
         const backGeometry = new THREE.PlaneGeometry(2.5, 3.5);
         backGeometry.applyMatrix4(new THREE.Matrix4().makeRotationY(Math.PI));
         const backTexture = loader.load('vc-badge-back.png');
-        const backMaterial = new THREE.MeshBasicMaterial({
+        const backMaterial = new THREE.MeshStandardMaterial({
             roughness: 0.7,
             alphaMap: alpha,
             alphaTest: 0.05,
@@ -79,6 +86,7 @@
 
         scene.add(card);
 
+        card.rotation.y -= Math.PI / 2.0;
         camera.position.z = 5;
 
         const clock = new THREE.Clock();
