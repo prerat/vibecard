@@ -50,9 +50,12 @@
         const texture = loader.load(textureUrl);
         const roughness = loader.load('vc-badge-roughness.png');
         const metalness = loader.load('vc-badge-metalness.png');
+        const alpha = loader.load('vc-badge-alpha.png');
         const material = new THREE.MeshPhysicalMaterial({
             roughnessMap: roughness,
             metalnessMap: metalness,
+            alphaMap: alpha,
+            alphaTest: 0.05,
             metalness: 0.5,
             roughness: 0.5,
             map: texture
@@ -62,8 +65,10 @@
         const backGeometry = new THREE.PlaneGeometry(2.5, 3.5);
         backGeometry.applyMatrix4(new THREE.Matrix4().makeRotationY(Math.PI));
         const backTexture = loader.load('vc-badge-back.png');
-        const backMaterial = new THREE.MeshPhysicalMaterial({
+        const backMaterial = new THREE.MeshBasicMaterial({
             roughness: 0.7,
+            alphaMap: alpha,
+            alphaTest: 0.05,
             map: backTexture
         });
         const cardBack = new THREE.Mesh(backGeometry, backMaterial);
