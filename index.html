@@ -33,14 +33,14 @@
         const textureUrl = params.has('texture') ? params.get('texture') : 'vc-badge-front.png';
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(75, self.innerWidth / self.innerHeight, 0.1, 1000);
 
         const loader = new THREE.TextureLoader();
 
         const renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(self.innerWidth, self.innerHeight);
         document.body.appendChild(renderer.domElement);
 
         const composer = new EffectComposer(renderer);
