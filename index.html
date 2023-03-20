@@ -23,7 +23,11 @@
     </script>
     <script type="module">
         import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
         const params = new URL(window.location.toLocaleString()).searchParams;
         const textureUrl = params.has('texture') ? params.get('texture') : 'vc-badge-front.png';
@@ -39,8 +43,26 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
+        const composer = new EffectComposer(renderer);
+        const renderPass = new RenderPass(scene, camera);
+        composer.addPass(renderPass);
+
+        const bloom = new UnrealBloomPass();
+        bloom.threshold = 0.8;
+        bloom.strength = 0.3;
+        bloom.exposure = 1;
+        composer.addPass(bloom);
+
+        const controls = new OrbitControls(camera, renderer.domElement); 
+        controls.minPolarAngle = Math.PI * 0.2;
+        controls.maxPolarAngle = Math.PI * 0.8;
+        controls.minDistance = 2;
+        controls.maxDistance = 6;
+        controls.autoRotate = true;
+        controls.enableDamping = true;
+
         const rgbeLoader = new RGBELoader();
-        const hdr = await rgbeLoader.loadAsync('outdoor_1k.hdr');
+        const hdr = await rgbeLoader.loadAsync('studio_small_08_1k.hdr');
         hdr.mapping = THREE.EquirectangularReflectionMapping;
         scene.environment = hdr;
 
@@ -51,7 +73,7 @@
             alphaMap: alpha,
             alphaTest: 0.05,
             metalness: 1,
-            roughness: 0.05,
+            roughness: 0.4,
             iridescence: 1,
             iridescenceIOR: 1.5,
             map: texture
@@ -62,8 +84,8 @@
         backGeometry.applyMatrix4(new THREE.Matrix4().makeRotationY(Math.PI));
         const backTexture = loader.load('vc-badge-back.png');
         const backMaterial = new THREE.MeshPhysicalMaterial({
-            roughness: 0.15,
-            metalness: 0,
+            roughness: 0.4,
+            metalness: 0.5,
             alphaMap: alpha,
             alphaTest: 0.05,
             map: backTexture
@@ -76,16 +98,17 @@
 
         scene.add(card);
 
-        card.rotation.x -= Math.PI / 24.0;
-        card.rotation.y -= Math.PI / 2.0;
+        card.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 24.0));
+        card.applyMatrix4(new THREE.Matrix4().makeRotationY(-Math.PI / 2.0));
         camera.position.z = 5;
 
         const clock = new THREE.Clock();
 
         function animate() {
             requestAnimationFrame(animate);
-            card.rotation.y += clock.getDelta() * Math.PI / 3.0;
-            renderer.render(scene, camera);
+            controls.autoRotateSpeed = clock.getDelta() * 1000 * Math.PI / 10.0;
+            controls.update();
+            composer.render();
         }
         animate();
     </script>
