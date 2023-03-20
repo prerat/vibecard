@@ -48,9 +48,10 @@
         composer.addPass(renderPass);
 
         const bloom = new UnrealBloomPass();
-        bloom.threshold = 0.8;
-        bloom.strength = 0.3;
+        bloom.threshold = 0.4;
+        bloom.strength = 1.5;
         bloom.exposure = 1;
+        bloom.radius = 0.5;
         composer.addPass(bloom);
 
         const controls = new OrbitControls(camera, renderer.domElement); 
@@ -62,9 +63,12 @@
         controls.enableDamping = true;
 
         const rgbeLoader = new RGBELoader();
-        const hdr = await rgbeLoader.loadAsync('studio_small_08_1k.hdr');
+        const hdr = await rgbeLoader.loadAsync('sunflowers_puresky_1k.hdr');
         hdr.mapping = THREE.EquirectangularReflectionMapping;
         scene.environment = hdr;
+
+        const ambientLight = new THREE.AmbientLight(0xfbfaf5, 0.25);
+        scene.add(ambientLight);
 
         const geometry = new THREE.PlaneGeometry(2.5, 3.5);
         const texture = loader.load(textureUrl);
@@ -72,8 +76,8 @@
         const material = new THREE.MeshPhysicalMaterial({
             alphaMap: alpha,
             alphaTest: 0.05,
-            metalness: 1,
-            roughness: 0.4,
+            metalness: 0.8,
+            roughness: 0.08,
             iridescence: 1,
             iridescenceIOR: 1.5,
             map: texture
@@ -100,7 +104,7 @@
 
         card.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 24.0));
         card.applyMatrix4(new THREE.Matrix4().makeRotationY(-Math.PI / 2.0));
-        camera.position.z = 5;
+        camera.position.z = 4;
 
         const clock = new THREE.Clock();
 
