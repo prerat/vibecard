@@ -33,15 +33,23 @@
         const textureUrl = params.has('texture') ? params.get('texture') : 'vc-badge-front.png';
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, self.innerWidth / self.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
         const loader = new THREE.TextureLoader();
 
         const renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.setSize(self.innerWidth, self.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        window.addEventListener("resize", onWindowResize, false);
 
         const composer = new EffectComposer(renderer);
         const renderPass = new RenderPass(scene, camera);
@@ -104,7 +112,7 @@
 
         card.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 24.0));
         card.applyMatrix4(new THREE.Matrix4().makeRotationY(-Math.PI / 2.0));
-        camera.position.z = 4;
+        camera.position.z = 4.5;
 
         const clock = new THREE.Clock();
 
